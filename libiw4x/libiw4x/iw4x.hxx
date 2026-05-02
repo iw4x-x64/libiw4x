@@ -41,3 +41,7 @@ namespace iw4x
     DllMain (HINSTANCE, DWORD reason, LPVOID);
   }
 }
+
+// Linker pseudo-variable.
+//
+extern "C" IMAGE_DOS_HEADER __ImageBase;
