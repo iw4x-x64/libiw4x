@@ -12,6 +12,7 @@
 
 #include <libiw4x/logger.hxx>
 #include <libiw4x/version.hxx>
+#include <libiw4x/memory.hxx>
 
 using namespace std;
 
@@ -219,6 +220,16 @@ namespace iw4x
         // Create console and file sinks.
         //
         logger = new class logger;
+
+        // Built-in patches.
+        //
+        //
+        memory::write (0x1402A91E5, "\xB0\x01");                                // Suppress XGameRuntimeInitialize call in WinMain
+        memory::write (0x1402A91E7, 0x90, 3);                                   // ^
+        memory::write (0x1402A6A4B, 0x90, 5);                                   // Suppress XCurl call in Live_Init
+        memory::write (0x1402A6368, 0x90, 5);                                   // Suppress XCurl call in Live_Frame
+        memory::write (0x1402A8CFE, 0x90, 5);                                   // Suppress GDK shutdown in Com_Quit_f (avoids crash)
+
 
         // __scrt_common_main_seh
         //
