@@ -8,6 +8,8 @@
 #include <ios>
 #include <string>
 
+#include <tracy/Tracy.hpp>
+
 using namespace std;
 
 namespace iw4x
@@ -17,6 +19,8 @@ namespace iw4x
     void
     attach_console ()
     {
+      ZoneScoped;
+
       // The subtlety here is that Windows has many ways to end up with stdout
       // and stderr pointing *somewhere* (sometimes to an actual console,
       // sometimes to a pipe, sometimes to a completely invalid handle). We do
@@ -99,6 +103,8 @@ namespace iw4x
       uintptr_t t (0x140358EBC);
       uintptr_t s (reinterpret_cast<uintptr_t> (+[] ()
       {
+        ZoneScopedN ("IW4x");
+
         // __security_init_cookie
         //
         reinterpret_cast<void (*) ()> (0x1403598CC) ();
