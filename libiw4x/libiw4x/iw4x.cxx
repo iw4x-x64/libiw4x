@@ -10,6 +10,9 @@
 
 #include <tracy/Tracy.hpp>
 
+#include <libiw4x/logger.hxx>
+#include <libiw4x/version.hxx>
+
 using namespace std;
 
 namespace iw4x
@@ -212,6 +215,10 @@ namespace iw4x
         // Attach standard streams to parent console.
         //
         attach_console ();
+
+        // Create console and file sinks.
+        //
+        logger = new class logger;
 
         // __scrt_common_main_seh
         //
