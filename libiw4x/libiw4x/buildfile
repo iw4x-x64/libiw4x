@@ -1,8 +1,9 @@
 intf_libs = # Interface dependencies.
 impl_libs = # Implementation dependencies.
 
-import intf_libs += libtracy%lib{tracy}
+import intf_libs += libboost-asio%lib{boost_asio}
 import intf_libs += libquill%lib{quill}
+import intf_libs += libtracy%lib{tracy}
 
 lib{iw4x}: {hxx ixx txx cxx}{** -version} \
            {hxx            }{    version} \
