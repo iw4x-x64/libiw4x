@@ -2,10 +2,12 @@
 
 #include <cstdint>
 
+#include <windows.h>
+
+#include <tracy/Tracy.hpp>
+
 #include <libiw4x/detour.hxx>
 #include <libiw4x/logger.hxx>
-
-#include <windows.h>
 
 using namespace std;
 
@@ -69,6 +71,8 @@ namespace iw4x
     window_module::
     window_module ()
     {
+      ZoneScoped;
+
       CreateWindowExA = reinterpret_cast<CreateWindowExA_t> (
         GetProcAddress (GetModuleHandleA ("user32.dll"), "CreateWindowExA"));
 

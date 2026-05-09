@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include <tracy/Tracy.hpp>
+
 #include <libiw4x/detour.hxx>
 #include <libiw4x/scheduler.hxx>
 
@@ -37,6 +39,8 @@ namespace iw4x
     scheduler_module::
     scheduler_module ()
     {
+      ZoneScoped;
+
       detour (Com_Frame_Try_Block_Function, &com_frame_try_block_function);
     }
   }
