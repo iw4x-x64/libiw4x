@@ -852,6 +852,14 @@ namespace iw4x
     DATA_COUNT = 0xA,
   };
 
+  // 375
+  //
+  enum FsListBehavior_e
+  {
+    FS_LIST_PURE_ONLY = 0x0,
+    FS_LIST_ALL = 0x1,
+  };
+
   // 548
   //
   enum nodeType
@@ -5843,6 +5851,15 @@ namespace iw4x
     const char** strings;
   };
 
+  // 2313
+  //
+  struct XZoneInfo
+  {
+    const char *name;
+    int allocFlags;
+    int freeFlags;
+  };
+
   // 2370
   struct field_t
   {
@@ -6022,6 +6039,15 @@ namespace iw4x
 
   using  DB_FindXAssetHeader_t = XAssetHeader (*) (XAssetType, const char* name);
   inline DB_FindXAssetHeader_t DB_FindXAssetHeader = reinterpret_cast<DB_FindXAssetHeader_t> (0x140129220);
+
+  using  DB_GetRawBuffer_t = void (*) (RawFile* rawfile, char* buffer, int size);
+  inline DB_GetRawBuffer_t DB_GetRawBuffer = reinterpret_cast<DB_GetRawBuffer_t> (0x1401298D0);
+
+  using  DB_GetRawFileLen_t = int (*) (RawFile* rawfile);
+  inline DB_GetRawFileLen_t DB_GetRawFileLen = reinterpret_cast<DB_GetRawFileLen_t> (0x140129A00);
+
+  using  DB_LoadXAssets_t = void (*) (XZoneInfo*, int, int);
+  inline DB_LoadXAssets_t DB_LoadXAssets = reinterpret_cast<DB_LoadXAssets_t> (0x14012A790);
 
   using  Dvar_AddCommands_t = void (*) (void);
   inline Dvar_AddCommands_t Dvar_AddCommands = reinterpret_cast<Dvar_AddCommands_t> (0x140200EE0);
@@ -6209,6 +6235,18 @@ namespace iw4x
   using  FreeStringInternal_t = void (*) (const char*);
   inline FreeStringInternal_t FreeStringInternal = reinterpret_cast<FreeStringInternal_t> (0x140281490);
 
+  using  FS_ListFiles_t = const char** (*) (const char* path, const char* extension, FsListBehavior_e behavior, int* numfiles, int allocTrackType);
+  inline FS_ListFiles_t FS_ListFiles = reinterpret_cast<FS_ListFiles_t> (0x14027B0F0);
+
+  using  FSFreeFileList_t = void (*) (const char** list, int allocTrackType);
+  inline FSFreeFileList_t FSFreeFileList = reinterpret_cast<FSFreeFileList_t> (0x14027B0E0);
+
+  using  GScr_LoadGameTypeScript_t = void (*) ();
+  inline GScr_LoadGameTypeScript_t GScr_LoadGameTypeScript = reinterpret_cast<GScr_LoadGameTypeScript_t> (0x1401AAE90);
+
+  using  Hunk_AllocateTempMemoryHigh_t = void* (*) (int size);
+  inline Hunk_AllocateTempMemoryHigh_t Hunk_AllocateTempMemoryHigh = reinterpret_cast<Hunk_AllocateTempMemoryHigh_t> (0x1402814B0);
+
   using  I_strcmp_t = __int64 (*) (const char *s0, const char *s1);
   inline I_strcmp_t I_strcmp = reinterpret_cast<I_strcmp_t> (0x14028E200);
 
@@ -6287,6 +6325,27 @@ namespace iw4x
   using  R_TextHeight_t = int (*) (Font_s *font);
   inline R_TextHeight_t R_TextHeight = reinterpret_cast<R_TextHeight_t> (0x1400199C0);
 
+  using  Scr_AddSourceBuffer_t = const char* (*) (const char* filename, const char* extFilename);
+  inline Scr_AddSourceBuffer_t Scr_AddSourceBuffer = reinterpret_cast<Scr_AddSourceBuffer_t> (0x140222140);
+
+  using  Scr_ExecThread_t = std::int64_t (*) (int handle, unsigned int paramcount);
+  inline Scr_ExecThread_t Scr_ExecThread = reinterpret_cast<Scr_ExecThread_t> (0x14022CF10);
+
+  using  Scr_FreeThread_t = void (*) (std::uint16_t handle);
+  inline Scr_FreeThread_t Scr_FreeThread = reinterpret_cast<Scr_FreeThread_t> (0x14022CFA0);
+
+  using  Scr_GetFunctionHandle_t = int (*) (const char* filename, const char* name);
+  inline Scr_GetFunctionHandle_t Scr_GetFunctionHandle = reinterpret_cast<Scr_GetFunctionHandle_t> (0x140221080);
+
+  using  Scr_LoadGameType_t = void (*) ();
+  inline Scr_LoadGameType_t Scr_LoadGameType = reinterpret_cast<Scr_LoadGameType_t> (0x1401ABDD0);
+
+  using  Scr_LoadScript_t = unsigned int (*) (const char* path);
+  inline Scr_LoadScript_t Scr_LoadScript = reinterpret_cast<Scr_LoadScript_t> (0x1402211B0);
+
+  using  Scr_StartupGameType_t = void (*) ();
+  inline Scr_StartupGameType_t Scr_StartupGameType = reinterpret_cast<Scr_StartupGameType_t> (0x1401AC4F0);
+
   using  StringTable_GetAsset_t = __int64 (*) (const char *, __int64 *);
   inline StringTable_GetAsset_t StringTable_GetAsset = reinterpret_cast<StringTable_GetAsset_t> (0x140282E50);
 
@@ -6331,17 +6390,17 @@ namespace iw4x
 
   // Internal global variables.
   //
-  inline volatile FastCriticalSection* g_dvarCritSect = reinterpret_cast<FastCriticalSection*> (0x14673D280);
-  inline bool*                         areDvarsSorted = reinterpret_cast<bool*> (0x14673D270);
-  inline int*                          dvarCount = reinterpret_cast<int*> (0x1466D3268);
-  inline int**                         sv_dvar_modifiedFlags = reinterpret_cast<int**> (0x1466D3260);
-  inline dvar_t*                       dvarPool = reinterpret_cast<dvar_t*> (0x1466DB270);
-  inline dvar_t**                      sortedDvars = reinterpret_cast<dvar_t**> (0x1466D3270);
-  inline dvar_t**                      dvarHashTable = reinterpret_cast<dvar_t**> (0x14673B270);
-  inline CmdArgs*                      cmd_args = reinterpret_cast<CmdArgs*> (0x141C17810);
-  inline PlayerKeyState*               playerKeys = reinterpret_cast<PlayerKeyState*> (0x14070DA30);
-  inline clientUIActive_t*             clientUIActives (reinterpret_cast<clientUIActive_t*> (0x140718FB0));
-  inline clientStatic_t*               cls = reinterpret_cast<clientStatic_t*> (0x140CA7BB0);
+  inline bool*                         areDvarsSorted        = reinterpret_cast<bool*>                (0x14673D270);
+  inline clientStatic_t*               cls                   = reinterpret_cast<clientStatic_t*>      (0x140CA7BB0);
+  inline clientUIActive_t*             clientUIActives       = reinterpret_cast<clientUIActive_t*>    (0x140718FB0);
+  inline CmdArgs*                      cmd_args              = reinterpret_cast<CmdArgs*>             (0x141C17810);
+  inline dvar_t*                       dvarPool              = reinterpret_cast<dvar_t*>              (0x1466DB270);
+  inline dvar_t**                      dvarHashTable         = reinterpret_cast<dvar_t**>             (0x14673B270);
+  inline dvar_t**                      sortedDvars           = reinterpret_cast<dvar_t**>             (0x1466D3270);
+  inline int*                          dvarCount             = reinterpret_cast<int*>                 (0x1466D3268);
+  inline int**                         sv_dvar_modifiedFlags = reinterpret_cast<int**>                (0x1466D3260);
+  inline PlayerKeyState*               playerKeys            = reinterpret_cast<PlayerKeyState*>      (0x14070DA30);
+  inline volatile FastCriticalSection* g_dvarCritSect        = reinterpret_cast<FastCriticalSection*> (0x14673D280);
 
   inline constexpr int KEYCATCH_CONSOLE (1);
   inline constexpr int KEYCATCH_CGAME   (8);
