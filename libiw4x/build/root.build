@@ -2,15 +2,13 @@ cxx.std = latest
 
 using cxx
 
-# We use .def file to export symbols for all Windows targets.
-#
-if ($c.target.class == 'windows')
-  using bin.def
-
 hxx{*}: extension = hxx
 ixx{*}: extension = ixx
 txx{*}: extension = txx
 cxx{*}: extension = cxx
+
+using bin.def
+
 def{*}: extension = def
 
 # The test target for cross-testing (running tests under Wine, etc).
