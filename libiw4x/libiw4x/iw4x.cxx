@@ -16,6 +16,7 @@
 
 #include <libiw4x/mod/scheduler.hxx>
 #include <libiw4x/mod/window.hxx>
+#include <libiw4x/mod/dvar.hxx>
 
 using namespace std;
 
@@ -241,6 +242,7 @@ namespace iw4x
         //
         mod::scheduler_module ();
         mod::window_module ();
+        mod::dvar_module ();
 
         // __scrt_common_main_seh
         //
