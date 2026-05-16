@@ -224,6 +224,10 @@ namespace iw4x
         //
         logger = new class logger;
 
+        // Banner.
+        //
+        log::notice << "IW4x " LIBIW4X_VERSION_FULL;
+
         // Built-in patches.
         //
         //

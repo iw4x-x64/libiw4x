@@ -4,7 +4,9 @@
 #include <chrono>
 #include <concepts>
 #include <cstddef>
+#include <format>
 #include <functional>
+#include <memory>
 #include <source_location>
 #include <sstream>
 #include <string>
@@ -204,7 +206,7 @@ namespace iw4x
       {
         void const* payload_;
 
-        void (*format_func_)  (stream_accumulator<L>&, void const*);
+        void (*format_func_) (stream_accumulator<L>&, void const*);
         void (*destroy_func_) (void*);
 
         alignas (std::max_align_t) std::byte storage_ [128];
@@ -214,10 +216,10 @@ namespace iw4x
         template <typename T>
           requires StreamableToAccumulator<T, L>
         first_arg (T&& value,
-                   std::source_location loc =
+                   std::source_location location =
                      std::source_location::current ()) noexcept
           : destroy_func_ (nullptr),
-            location_ (loc)
+            location_ (location)
         {
           using type = std::remove_cvref_t<T>;
 
@@ -228,7 +230,8 @@ namespace iw4x
           {
             payload_ = std::addressof (value);
 
-            format_func_ = [] (stream_accumulator<L>& accumulator, void const* p)
+            format_func_ =
+              [] (stream_accumulator<L>& accumulator, void const* p)
             {
               accumulator << *static_cast<type const*> (p);
             };
@@ -249,7 +252,8 @@ namespace iw4x
 
             payload_ = &storage_;
 
-            format_func_ = [] (stream_accumulator<L>& accumulator, void const* p)
+            format_func_ =
+              [] (stream_accumulator<L>& accumulator, void const* p)
             {
               accumulator << *static_cast<type const*> (p);
             };
@@ -291,9 +295,35 @@ namespace iw4x
       };
     }
 
+    namespace detail
+    {
+      // Carrier for a format string that sneaks in source_location via the
+      // implicit conversion from const char*. Same trick as first_arg but
+      // for the format-style call interface.
+      //
+      struct fmt_str
+      {
+        const char*          str;
+        std::source_location loc;
+
+        fmt_str (const char* s,
+                 std::source_location l = std::source_location::current ())
+          : str (s), loc (l) {}
+      };
+    }
+
+    // Check that a type is something std::format can actually digest. Without
+    // this the variadic pack is unguarded and will happily swallow anything,
+    // only to detonate deep inside <format> with an unreadable error.
+    //
+    template <typename T>
+    concept formattable = std::formattable<std::remove_cvref_t<T>, char>;
+
     template <level L>
     struct severity
     {
+      // Streaming interface
+      //
       stream_accumulator<L>
       operator << (detail::first_arg<L> arg) const
       {
@@ -304,17 +334,54 @@ namespace iw4x
         arg.format_func_ (r, arg.payload_);
         return r;
       }
+
+      // Format-style interface
+      //
+      // The source_location is captured during the implicit conversion of
+      // the format string literal to detail::fmt_str, so we get the call
+      // site for free without a macro.
+      //
+      template <formattable... A>
+      void
+      operator () (detail::fmt_str f, A&&... a) const
+      {
+        if constexpr (L >= min_level)
+        {
+          if (detail::should_log_statement (L))
+            detail::emit (L,
+                          f.loc,
+                          std::vformat (f.str,
+                                        std::make_format_args (a...)));
+        }
+      }
+
+      // Single-string shorthand
+      //
+      void
+      operator () (detail::fmt_str f) const
+      {
+        if constexpr (L >= min_level)
+        {
+          if (detail::should_log_statement (L))
+            detail::emit (L, f.loc, f.str);
+        }
+      }
     };
 
     inline constexpr severity<level::trace_l3> trace_l3 {};
     inline constexpr severity<level::trace_l2> trace_l2 {};
     inline constexpr severity<level::trace_l1> trace_l1 {};
-    inline constexpr severity<level::debug> debug {};
-    inline constexpr severity<level::info> info {};
-    inline constexpr severity<level::notice> notice {};
-    inline constexpr severity<level::warning> warning {};
-    inline constexpr severity<level::error> error {};
+    inline constexpr severity<level::debug>    debug    {};
+    inline constexpr severity<level::info>     info     {};
+    inline constexpr severity<level::notice>   notice   {};
+    inline constexpr severity<level::warning>  warning  {};
+    inline constexpr severity<level::error>    error    {};
     inline constexpr severity<level::critical> critical {};
+
+    // Convenience alias. Most of the time you just want "trace" without
+    // caring which sub-level it maps to.
+    //
+    inline constexpr severity<level::trace_l1> trace {};
 
     struct rate_limiter
     {
