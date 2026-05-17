@@ -486,6 +486,9 @@ hxx{version}: in{version} $src_root/manifest
 #
 cxx.poptions =+ "-I$out_root" "-I$src_root"
 
+if ($config.libiw4x.develop)
+  cxx.poptions += "-DLIBIW4X_DEVELOP"
+
 obja{*}: cxx.poptions += -DLIBIW4X_STATIC_BUILD
 objs{*}: cxx.poptions += -DLIBIW4X_SHARED_BUILD
 
@@ -504,10 +507,10 @@ libs{iw4x}: cxx.export.poptions += -DLIBIW4X_SHARED
 # be used in place of another pre-release or the final version. See
 # the version module for details on the version.* variable values.
 #
-if $version.pre_release
-  lib{iw4x}: bin.lib.version = "-$version.project_id"
-else
-  lib{iw4x}: bin.lib.version = "-$version.major.$version.minor"
+# if $version.pre_release
+#   lib{iw4x}: bin.lib.version = "-$version.project_id"
+# else
+#   lib{iw4x}: bin.lib.version = "-$version.major.$version.minor"
 
 # Install into the libiw4x/ subdirectory of, say, /usr/include/
 # recreating subdirectories.
