@@ -18,6 +18,7 @@
 #include <libiw4x/mod/window.hxx>
 #include <libiw4x/mod/dvar.hxx>
 #include <libiw4x/mod/demonware.hxx>
+#include <libiw4x/mod/console.hxx>
 
 using namespace std;
 
@@ -245,6 +246,7 @@ namespace iw4x
         mod::window_module ();
         mod::dvar_module ();
         mod::demonware_module ();
+        mod::console_module ();
 
         // __scrt_common_main_seh
         //
