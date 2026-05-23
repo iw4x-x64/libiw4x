@@ -6,6 +6,10 @@ import intf_libs += libtracy%lib{tracy}
 import intf_libs += libzydis%lib{zydis}
 import intf_libs += libimmer%lib{immer}
 
+# Fast string matching library.
+#
+rapidfuzz = $src_root/../upstream/rapidfuzz/public
+
 lib{iw4x}: {hxx ixx txx cxx}{** -{version utility-*installed}} \
            {hxx            }{     version                    } \
            {def            }{**                              } \
@@ -485,7 +489,7 @@ hxx{version}: in{version} $src_root/manifest
 
 # Build options.
 #
-cxx.poptions =+ "-I$out_root" "-I$src_root"
+cxx.poptions =+ "-I$out_root" "-I$src_root" "-I$rapidfuzz"
 
 if ($config.libiw4x.develop)
   cxx.poptions += "-DLIBIW4X_DEVELOP"
