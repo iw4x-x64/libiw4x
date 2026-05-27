@@ -8,7 +8,17 @@ import intf_libs += libimmer%lib{immer}
 
 # Fast string matching library.
 #
-rapidfuzz = $src_root/../upstream/rapidfuzz/public
+rapidfuzz = $src_root/../upstream/rapidfuzz
+
+# Steamworks SDK.
+#
+steam     = $src_root/../upstream/steam
+cxx.libs += $steam/redistributable_bin/win64/steam_api64.lib
+
+# Discord Partner SDK.
+#
+discord   = $src_root/../upstream/discord
+cxx.libs += $discord/redistributable_bin/win64/discord_partner_sdk.lib
 
 lib{iw4x}: {hxx ixx txx cxx}{** -{version utility-*installed}} \
            {hxx            }{     version                    } \
@@ -489,7 +499,10 @@ hxx{version}: in{version} $src_root/manifest
 
 # Build options.
 #
-cxx.poptions =+ "-I$out_root" "-I$src_root" "-I$rapidfuzz"
+cxx.poptions =+ "-I$out_root" "-I$src_root" \
+                "-I$rapidfuzz/public"       \
+                "-I$steam/public"           \
+                "-I$discord/public"
 
 if ($config.libiw4x.develop)
   cxx.poptions += "-DLIBIW4X_DEVELOP"
