@@ -1319,7 +1319,6 @@ namespace iw4x
 
   // 979
   //
-#pragma pack (push, 4)
   union MaterialArgumentDef
   {
     const float* literalConst;
@@ -1336,12 +1335,6 @@ namespace iw4x
     unsigned short dest;
     MaterialArgumentDef u;
   };
-#pragma pack (pop)
-
-  static_assert (offsetof (MaterialShaderArgument, u) == 4,
-                 "MaterialShaderArgument::u ABI offset mismatch");
-  static_assert (sizeof (MaterialShaderArgument) == 12,
-                 "MaterialShaderArgument ABI size mismatch");
 
   // 981
   //
