@@ -538,3 +538,44 @@ libs{iw4x}: cxx.export.poptions += -DLIBIW4X_SHARED
   install         = include/libiw4x/
   install.subdirs = true
 }
+
+# Handle the installation of external SDK shared libraries (DLLs).
+#
+# The Steam and Discord SDKs provide pre-built DLLs that we need to install
+# alongside our executables. However, these files physically reside outside of
+# our project's source tree (in the upstream/ directory).
+#
+# If we attempt to map them directly and assign an installation directory, the
+# build system will complain about installing from multiple projects (e.g.,
+# "unknown installation directory name 'root'"). This happens because the
+# installation machinery enforces project scopes and refuses to implicitly apply
+# our local config.install.root to targets that belong to an outer, out-of-tree
+# scope.
+#
+# To work around this, we bring these files into our project's jurisdiction. We
+# do this by declaring local file targets and using an ad-hoc recipe to copy the
+# external DLLs into our local build output directory during the update phase.
+
+file{steam_api64.dll}: \
+  $steam/redistributable_bin/win64/file{steam_api64.dll}
+{{
+  cp $path($<[0]) $path($>)
+}}
+
+file{steam_api64.dll}:
+{
+  install = bin/
+}
+
+file{discord_partner_sdk.dll}: \
+  $discord/redistributable_bin/win64/file{discord_partner_sdk.dll}
+{{
+  cp $path($<[0]) $path($>)
+}}
+
+file{discord_partner_sdk.dll}:
+{
+  install = bin/
+}
+
+lib{iw4x}: file{steam_api64.dll} file{discord_partner_sdk.dll}
